@@ -28,7 +28,6 @@ async def test_command(ctx):
 @bot.command(name='agenda', aliases=['c'])
 async def agenda_command(ctx):
     date = str(datetime.datetime.now().date())
-    date = "2020-07-26"
     agenda = subprocess.check_output("curl -s https://raw.githubusercontent.com/hackbacc/schedule/master/json/schedule.json | jq .'projects[] | select(.starts==\"" + date + "\") | .description'", shell=1)#[2:-1]
     if agenda == b"":
         agenda = "There is no agenda yet."
