@@ -2,6 +2,7 @@ import os
 from twitchio.ext import commands
 import subprocess
 import datetime
+import urllib.request, json
 
 bot = commands.Bot(
         irc_token="oauth:"+os.environ['tip'],
@@ -27,9 +28,23 @@ async def test_command(ctx):
 
 @bot.command(name='agenda', aliases=['c'])
 async def agenda_command(ctx):
-    date = str(datetime.datetime.now().date())
-    agenda = subprocess.check_output("curl -s https://raw.githubusercontent.com/hackbacc/schedule/master/json/schedule.json | jq .'projects[] | select(.starts==\"" + date + "\") | .description'", shell=1)#[2:-1]
-    if agenda == b"":
-        agenda = "There is no agenda yet."
-    await ctx.send(agenda.encode('utf-8'))
+    with urllib.request.urlopen("https://raw.githubusercontent.com/hackbacc/schedule/master/json/schedule.json") as url:
+        data = json.loads(url.read().decode())
+
+# with open('json/schedule.json', 'r') as f:
+#     data = json.load(f)
+
+    to_date = datetime.datetime.now().date()
+    agendas = []
+
+    for project in data['projects']:
+        st_date = datetime.datetime.strptime(project['starts'], "%Y-%m-%d").date() 
+        ed_date = datetime.datetime.strptime(project.get('ends', str(to_date)), "%Y-%m-%d").date()
+
+
+        if st_date <= to_date and to_date <= ed_date and (to_date.weekday() + 1) in project['days']:
+            agendas.append(project['description'])
+    
+    for agenda in agendas:
+        await ctx.send(agenda)#.encode('utf-8'))
 bot.run()
