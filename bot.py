@@ -31,5 +31,5 @@ async def agenda_command(ctx):
     agenda = subprocess.check_output("curl -s https://raw.githubusercontent.com/hackbacc/schedule/master/json/schedule.json | jq .'projects[] | select(.starts==\"" + date + "\") | .description'", shell=1)#[2:-1]
     if agenda == b"":
         agenda = "There is no agenda yet."
-    await ctx.send(agenda.decode('utf-8'))
+    await ctx.send(agenda.encode('utf-8'))
 bot.run()
