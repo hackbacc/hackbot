@@ -59,6 +59,15 @@ async def github_command(ctx):
 async def projects_command(ctx):
     payload = requests.get('https://api.github.com/users/hackbacc/repos').text
     for project in json.loads(payload):
-        await ctx.send(project['full_name'] + " - " + project['html_url'] + " - " + str(project['description']))
+        await ctx.send(project['full_name'] + " -\n " + project['html_url'] + " - " + str(project['description']))
 
+@bot.command(name='cmds', aliases=['c'])
+async def cmds_command(ctx):
+    cmds = []
+    for f in funcs:
+        if f.endswith('_command'):
+            cmds.append("!"+f.split('_')[0])
+    await ctx.send('available cmds are - ' + ' '.join(cmds))
+
+funcs = locals().keys()
 bot.run()

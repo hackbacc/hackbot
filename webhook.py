@@ -24,11 +24,13 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
 
         body = json.loads(body)
         if body['repository']['full_name'] == 'hackbacc/hackbot':
+            print('reset')
             pass
 
         self.wfile.write(response.getvalue())
 
 
-httpd = HTTPServer(('localhost', 6006), SimpleHTTPRequestHandler)
+# httpd = HTTPServer(('localhost', 6006), SimpleHTTPRequestHandler)
+httpd = HTTPServer(('0.0.0.0', 6006), SimpleHTTPRequestHandler)
 httpd.serve_forever()
 
