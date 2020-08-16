@@ -3,6 +3,7 @@ from twitchio.ext import commands
 import subprocess
 import datetime
 import urllib.request, json
+import requests
 
 bot = commands.Bot(
         irc_token="oauth:"+os.environ['tip'],
@@ -26,13 +27,10 @@ async def event_message(message):
 async def test_command(ctx):
     await ctx.send(f'Hello {ctx.author.name}')
 
-@bot.command(name='agenda', aliases=['c'])
+@bot.command(name='agenda', aliases=['a'])
 async def agenda_command(ctx):
     with urllib.request.urlopen("https://raw.githubusercontent.com/hackbacc/schedule/master/json/schedule.json") as url:
         data = json.loads(url.read().decode())
-
-# with open('json/schedule.json', 'r') as f:
-#     data = json.load(f)
 
     to_date = datetime.datetime.now().date()
     agendas = []
@@ -47,4 +45,20 @@ async def agenda_command(ctx):
     
     for agenda in agendas:
         await ctx.send(agenda)#.encode('utf-8'))
+
+@bot.command(name='discord', aliases=['d'])
+async def discord_command(ctx):
+    await ctx.send("https://discord.gg/9pQgEEx")
+
+@bot.command(name='github', aliases=['g'])
+async def github_command(ctx):
+    await ctx.send("Personal - https://github.com/markroxor")
+    await ctx.send("Channel - https://github.com/hackbacc")
+
+@bot.command(name='projects', aliases=['p'])
+async def projects_command(ctx):
+    payload = requests.get('https://api.github.com/users/hackbacc/repos').text
+    for project in json.loads(payload):
+        await ctx.send(project['full_name'] + " - " + project['html_url'] + " - " + str(project['description']))
+
 bot.run()
